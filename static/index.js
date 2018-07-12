@@ -30,6 +30,7 @@ class BooksList{
     }
     loadHTML(regFilter){
         this.clearHTML();
+        this.initCounters();
         for(let key in this._Books){
             if(regFilter instanceof RegExp){
                 if(!regFilter.test(this._Books[key].author)){
@@ -37,8 +38,10 @@ class BooksList{
                 }
             }
             if(this._Books[key].isRight){
+                this._BooksHTML.querySelector(".block>.countRight").innerHTML++;
                 this._BooksHTML.querySelector(".right").insertAdjacentHTML("beforeEnd", this.createHTMLBook(key, this._Books[key].author, this._Books[key].name, this._Books[key].img, 1));
             }else{
+                this._BooksHTML.querySelector(".block>.countLeft").innerHTML++;
                 this._BooksHTML.querySelector(".left").insertAdjacentHTML("beforeEnd", this.createHTMLBook(key, this._Books[key].author, this._Books[key].name, this._Books[key].img, 0));
             }
         }
@@ -59,6 +62,8 @@ class BooksList{
             ev.currentTarget.className = "before";
             root._Books[ev.currentTarget.parentNode.getAttribute('id')].isRight=1;
             root._BooksHTML.querySelector(".right").appendChild(ev.currentTarget.parentNode);
+            root._BooksHTML.querySelector(".block>.countRight").innerHTML++;
+            root._BooksHTML.querySelector(".block>.countLeft").innerHTML--;
             root.saveToLocalStorage();
         };
         function goLeft(ev){
@@ -66,6 +71,8 @@ class BooksList{
             ev.currentTarget.className = "after";
             root._Books[ev.currentTarget.parentNode.getAttribute('id')].isRight=0;
             root._BooksHTML.querySelector(".left").appendChild(ev.currentTarget.parentNode);
+            root._BooksHTML.querySelector(".block>.countRight").innerHTML--;
+            root._BooksHTML.querySelector(".block>.countLeft").innerHTML++;
             root.saveToLocalStorage();
         };
         let elems = document.querySelectorAll('div.item>div.after');
@@ -77,9 +84,17 @@ class BooksList{
             elems[i].onclick = goLeft;
         }
     };
+    initCounters(){
+        this._BooksHTML.querySelector(".block>.countLeft").innerHTML=0;
+        this._BooksHTML.querySelector(".block> .countRight").innerHTML=0;
+    };
 };
 window.onload = ()=>{ 
-    let list = new BooksList();
-    list.init();
-    list.loadHTML();
+    try{
+        let list = new BooksList();
+        list.init();
+        list.loadHTML();
+    }catch(err){
+        console.error(err);
+    }
 }
