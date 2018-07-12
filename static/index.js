@@ -1,15 +1,31 @@
+/**
+ * Connect to JSON file
+ * if protocol == file dont work in CHROME 
+ * @param {function} callback
+ * @returns {}
+ */
 function connectToJSON(callback){
     return fetch(location.protocol!=='file:'?'/static/data.json':"https://raw.githubusercontent.com/dimabendera/front-end-basics/master/static/data.json")
     .then(res => res.json())
     .then(callback)
     .catch(err => console.error(err)); 
 };
-// конструктор
 class BooksList{
+    /**
+     * write in _BooksHTML HTML Start Point
+     * @param {} 
+     * @returns {}
+     */
     constructor(){
         this._BooksHTML = document.querySelector("body > .content");
         this._Books = {};
     }
+    /**
+     * write in object _Books data from JSON
+     * or from local storage if its not empty
+     * @param {} 
+     * @returns {}
+     */
     async init(){
         if(!localStorage.getItem("books")){
             await connectToJSON((res)=>{
@@ -21,13 +37,34 @@ class BooksList{
         }
         this.initOnInputEvents();
     }
+    /**
+     * create HTML string (Book node)
+     * @param {String} key
+     * @param {String} author
+     * @param {String} name
+     * @param {String} img
+     * @param {String} key
+     * @param {Bool} isRight
+     * @returns {String}
+     */
     createHTMLBook(key, author, name, img, isRight){
         return '<div class="item" id="'+key+'"><div class="pic"><span><img src="'+img+'"></span></div><div class="title"><span><b>Название:</b> "'+name+'"</span><span><b>Автор:</b> '+author+'</span></div><div class="'+(isRight?"before":"after")+'"></div></div>';
     };
+    /**
+     * cleare inner HTML by class Selector .left and .right
+     * @param {} 
+     * @returns {}
+     */
     clearHTML(){
         this._BooksHTML.querySelector(".left").innerHTML="";
         this._BooksHTML.querySelector(".right").innerHTML="";
     }
+    /**
+     * create HTML books nodes into class .right and .left
+     * if regFilter exist filter author books
+     * @param {RegExp} regFilter
+     * @returns {}
+     */
     loadHTML(regFilter){
         this.clearHTML();
         this.initCounters();
@@ -47,14 +84,29 @@ class BooksList{
         }
         this.initOnClickEvents();
     };
+     /**
+     * save oblect _Books in local Storage
+     * @param {} 
+     * @returns {}
+     */
     saveToLocalStorage(){
         localStorage.setItem("books", JSON.stringify(this._Books));
     };
+    /**
+     * init filter Authors
+     * @param {} 
+     * @returns {}
+     */
     initOnInputEvents(){
         this._BooksHTML.querySelector("div>input").oninput = () => {
             this.loadHTML(new RegExp(".+"+this._BooksHTML.querySelector("div>input").value+".+", "i"));
         };
     };
+    /**
+     * init OnClick Events for move HTML node ".item"  left or right
+     * @param {} 
+     * @returns {}
+     */
     initOnClickEvents(){
         let root = this;
         function goRight(ev){
@@ -84,6 +136,11 @@ class BooksList{
             elems[i].onclick = goLeft;
         }
     };
+    /**
+     * rezero counters 
+     * @param {} 
+     * @returns {}
+     */
     initCounters(){
         this._BooksHTML.querySelector(".block>.countLeft").innerHTML=0;
         this._BooksHTML.querySelector(".block> .countRight").innerHTML=0;
