@@ -19,11 +19,17 @@ class BooksList{
             let books = JSON.parse(localStorage.getItem("books"));
             this._Books=(books===null)?{}:books;
         }
+        this.initOnInputEvents();
     }
     createHTMLBook(key, author, name, img, isRight){
         return '<div class="item" id="'+key+'"><div class="pic"><span><img src="'+img+'"></span></div><div class="title"><span><b>Название:</b> "'+name+'"</span><span><b>Автор:</b> '+author+'</span></div><div class="'+(isRight?"before":"after")+'"></div></div>';
     };
+    clearHTML(){
+        this._BooksHTML.querySelector(".left").innerHTML="";
+        this._BooksHTML.querySelector(".right").innerHTML="";
+    }
     loadHTML(regFilter){
+        this.clearHTML();
         for(let key in this._Books){
             if(regFilter instanceof RegExp){
                 if(!regFilter.test(this._Books[key].author)){
@@ -40,6 +46,11 @@ class BooksList{
     };
     saveToLocalStorage(){
         localStorage.setItem("books", JSON.stringify(this._Books));
+    };
+    initOnInputEvents(){
+        this._BooksHTML.querySelector("div>input").oninput = () => {
+            this.loadHTML(new RegExp(".+"+this._BooksHTML.querySelector("div>input").value+".+", "i"));
+        };
     };
     initOnClickEvents(){
         let root = this;
